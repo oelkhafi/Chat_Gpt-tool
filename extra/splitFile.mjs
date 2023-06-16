@@ -7,8 +7,8 @@ const file = await readFile(
   "utf-8"
 );
 // set directory paths for before & after files
-const dir1 = './Original_Code';
-const dir2 = './Refactor_Code';
+const dir1 = '../Original_Code';
+const dir2 = '../Refactor_Code';
 // checking if directories exist & creating if not
 if (!existsSync(dir1) || !existsSync(dir2)) {
   mkdirSync(dir1);

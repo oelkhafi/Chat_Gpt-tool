@@ -33,7 +33,6 @@ if (!existsSync(dir1)) {
 console.log('successful directory setup');
 
 
-
 // identify number of files to refactor
 const length = fileNames.length;
 console.log(`beginning refactor of ${length} files`);
