@@ -5,7 +5,7 @@ import { config } from "dotenv";
 import fileNames from "./java_file_setup.mjs";
 
 
-class GptTool {
+class gptTool {
     /**
      * @constructor
      * @param {string} apiKey -  api key for making api calls
@@ -180,7 +180,7 @@ class GptTool {
 }
 
 // create a new instance of the GptTool class
-const gptTool = new GptTool(process.env.OPENAI_API_KEY, fileNames);
+const gptTool = new gptTool(process.env.OPENAI_API_KEY, fileNames);
 // refactor the files
 gptTool.refactorFiles();
 
