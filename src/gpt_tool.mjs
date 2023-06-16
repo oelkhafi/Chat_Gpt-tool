@@ -183,33 +183,3 @@ class gptTool {
 const gptTool = new gptTool(process.env.OPENAI_API_KEY, fileNames);
 // refactor the files
 gptTool.refactorFiles();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // prompt 1: Check if methods are worth separation
-// const shouldSeparateMethods = await this.promptForSeparation(file);
-// if (shouldSeparateMethods) {
-//     // prompt 2: Separate the method in the following class code and only return the code
-//     const refactoredCode = await this.promptForMethodRefactoring(file);
-//     if (refactoredCode) {
-//         // prompt 3: Recommend method names for the code segment
-//         const recommendedMethodNames = await this.promptForMethodNames(file);
-//         // perform further processing or actions based on the recommended method names
-//         console.log(recommendedMethodNames);
-//     }
-// }
