@@ -1,8 +1,13 @@
+// run npm start at the beginning of a session to load the .env variables (api key)
+// import config from .env
+import { config } from "dotenv";
+config();
+// package & module imports
 import { Configuration, OpenAIApi } from "openai";
 import { readFile, writeFile } from "fs/promises";
 import { existsSync, mkdirSync } from "fs";
-import { config } from "dotenv";
 import fileNames from "./java_file_setup.mjs";
+
 
 
 class gptTool {
@@ -12,7 +17,9 @@ class gptTool {
      * @param {string[]} fileNames - array of file names to be processed
      */
     constructor(apiKey, fileNames) {
+        console.log(apiKey)
         try {
+            console.log(apiKey)
             this.fileNames = fileNames;
             // log success message to console
             console.log('file names setup complete');
@@ -37,8 +44,6 @@ class gptTool {
             console.error('directory setup failed: ', error);
         }
         try {
-            // configure using .env file
-            config();
             // setup configuration (API key) for open ai calls
             this.configuration = new Configuration({
                 apiKey: apiKey,
@@ -80,26 +85,43 @@ class gptTool {
      */
     async callGPT(file) {
         try {
-            const response = await this.openai.createCompletion({
-                model: "text-davinci-003",
+            const response = await this.openai.createChatCompletion({
+                model: "gpt-3.5-turbo",
                 messages: [
                     // prompt to tell gpt what to do
-                    { role: "system", content: `using this file of java code please answer the following user questions. here is the file: ${file}` },
+                    { role: "system", content: `you are a tool for refactoring the first method in this class of java code, if it has any methods. \n here is the class code for you to reference: \n ${file}` },
                     // worth speration?
-                    { role: "user", content: "yes or no: are the methods in this provided java class worth seperation?" },
+                    { role: "user", content: " is the first method in this provided java class worth seperation? \n only provide a yes or no answer." },
                     // seperate, but we will only access if first response is yes
-                    { role: "user", content: "separate the method in the following class code and only return the code, no explanation. be precise when identifying the java method in the java class" },
+                    { role: "user", content: " separate the first method in the java class code provided earlier and only return the code, no explanation." },
                     // suggest method names, but only access if first response is yes
-                    { role: "user", content: "what would be the recommended method name for that seperated method?" },
+                    { role: "user", content: " what would be the recommended method name for that seperated method?" },
                 ],
-                temperature: 0.2,
-                max_tokens: 250,
-                top_p: 1.0,
-                frequency_penalty: 0.0,
-                presence_penalty: 0.0,
+                temperature: 0, // randomness of response (1 = random, 0 = deterministic)
+                max_tokens: 200, // max length of response
+                top_p: 1.0, // probability of token selection - ignore
+                frequency_penalty: 0.0, // likelihood of repeating (0 = reapeat responses, 1 = diverse responses)
+                presence_penalty: 0.0, // adjust new responses/ideas (0 = trained content , 1 = original content)
             });
+
+            // --------------------- DEBUGGING --------------------- //
+            response.data.choices.forEach((choice, index) => {
+                const content = choice.message.content;
+                console.log(`Response ${index + 1}: ${content}`);
+                const finishReason = choice.finish_reason;
+                console.log(`Finish Reason: ${finishReason}`);
+            });
+            // --------------------- DEBUGGING --------------------- //
+
+
             // extracting responses from the response.data.choices object
             const responses = response.data.choices.map(choice => choice.message.content.trim());
+
+
+            // --------------------- DEBUGGING --------------------- //
+            console.dir(response, { depth: 10 });
+            // --------------------- DEBUGGING --------------------- //
+
             // return the responses
             return responses;
         } catch (error) {
@@ -151,14 +173,48 @@ class gptTool {
                     console.log(`file ${this.fileNames[i]} is empty, skipping`);
                     continue;
                 }
+
+
+                // --------------------- DEBUGGING --------------------- //
+                // console.log("*** FILE ***", file)
+                // try to see rate limits
+                // try {
+                //     const apiKey = "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"; // Replace with your actual API key
+
+                //     const response = await axios.get('https://api.openai.com/v1/usage', {
+                //         headers: {
+                //             'Authorization': `Bearer ${apiKey}`
+                //         }
+                //     });
+
+                //     const rateLimits = response.data.data[0].usage;
+
+                //     console.log('Rate Limits:');
+                //     console.log('  Requests Remaining:', rateLimits.remaining);
+                //     console.log('  Requests Limit:', rateLimits.limit);
+                //     console.log('  Requests Used:', rateLimits.used);
+                //     console.log('  Reset Timestamp:', new Date(rateLimits.reset * 1000));
+                // } catch (error) {
+                //     console.error('Failed to check rate limits:', error.message);
+                // }
+                // --------------------- DEBUGGING --------------------- //
+
+
                 // generate open ai completion
                 const response = await this.callGPT(file);
                 if (response === []) {
                     console.log(`api call error for ${this.fileNames[i]}, skipping`);
                     continue;
                 }
-                // check if the first response is "yes"
-                const isFirstResponseYes = response[1].toLowerCase() === "yes";
+                // check if responses exists & if first response is "yes"
+                const isFirstResponseYes = response && response.length >= 2 && response[1].toLowerCase() === "yes";
+
+                // --------------------- DEBUGGING --------------------- //
+                console.log("*** RESPONSE ***", response[1], response[2], response[3])
+
+                //console.log("*** CODE ***", response[2])
+                // --------------------- DEBUGGING --------------------- //
+
                 // if yes, assign responses of last two prompts to variables
                 if (isFirstResponseYes) {
                     // extract the code and method name from the response
@@ -180,6 +236,9 @@ class gptTool {
 }
 
 // create a new instance of the GptTool class
-const gptTool = new gptTool(process.env.OPENAI_API_KEY, fileNames);
+// const tool = new gptTool(process.env.OPENAI_API_KEY, fileNames);
+// const tool = new gptTool(process.env.API_KEY, fileNames);
+const tool = new gptTool(process.env.API_KEY, fileNames);
 // refactor the files
-gptTool.refactorFiles();
+tool.refactorFiles();
+

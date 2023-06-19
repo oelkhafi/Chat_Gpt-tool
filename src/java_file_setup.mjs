@@ -5,7 +5,6 @@ import path from 'path';
 // const parentFolderPath = 'java_test_files';
 
 
-
 // // MOVING AROUND JAVA TEST FILES //
 
 // async function moveContents() {
@@ -37,7 +36,7 @@ import path from 'path';
 
 // // RENAMING .JAVA FILES //
 
-const folderPath = './Original_Code';
+const folderPath = 'src/Original_Code';
 // const newFileName = 'java_code_';
 // console.log("START")
 
