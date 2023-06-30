@@ -93,7 +93,7 @@ class gptTool {
             // generate open ai completion
             const response = await this.openai.createCompletion({
                 model: "text-davinci-003",
-                prompt: `REFACTOR THE METHOD IN THE FOLLOWING CLASS CODE AND ONLY RETURN THE CODE, NO EXPLANATION. BE PRECISE WHEN IDENTIFYING THE JAVA METHOD IN THE JAVA CLASS: ${file}`,
+                prompt: `Evaluate the methods in the given Java class to determine if they require refactoring for separation. If separation is advised, provide the suggested code changes and recommended method names for the identified methods. Here is the class: ${file}`,
                 temperature: 0, // randomness of response (1 = random, 0 = deterministic)
                 max_tokens: 64, // max length of response
                 top_p: 1.0, // probability of token selection - ignore
