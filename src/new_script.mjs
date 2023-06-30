@@ -2,7 +2,7 @@
 
 // import libraries & external variables
 import { Configuration, OpenAIApi } from "openai";
-import { readFile, writeFile, appendFile } from "fs/promises";
+import { readFile, writeFile } from "fs/promises";
 import { config } from "dotenv";
 import { existsSync, mkdirSync } from "fs";
 import fileNames from "./java_file_setup.mjs";

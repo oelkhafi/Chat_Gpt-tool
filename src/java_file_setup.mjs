@@ -36,7 +36,7 @@ import path from 'path';
 
 // // RENAMING .JAVA FILES //
 
-const folderPath = 'src/Original_Code';
+const folderPath = './Original_Code';
 // const newFileName = 'java_code_';
 // console.log("START")
 

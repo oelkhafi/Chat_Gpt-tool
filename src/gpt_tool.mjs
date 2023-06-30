@@ -1,11 +1,16 @@
-// run npm start at the beginning of a session to load the .env variables (api key)
+// --------- STARTING GUIDE ---------
+// run npm install to download dependencies
+// run npm start to load the .env variables (api key)
+// run npm refactor to run this script
+// ----------------------------------
+
 // import config from .env
 import { config } from "dotenv";
 config();
 // package & module imports
 import { Configuration, OpenAIApi } from "openai";
 import { readFile, writeFile } from "fs/promises";
-import { existsSync, mkdirSync } from "fs";
+import { existsSync, mkdirSync, write } from "fs";
 import fileNames from "./java_file_setup.mjs";
 
 
@@ -85,45 +90,24 @@ class gptTool {
      */
     async callGPT(file) {
         try {
-            const response = await this.openai.createChatCompletion({
-                model: "gpt-3.5-turbo",
-                messages: [
-                    // prompt to tell gpt what to do
-                    { role: "system", content: `you are a tool for refactoring the first method in this class of java code, if it has any methods. \n here is the class code for you to reference: \n ${file}` },
-                    // worth speration?
-                    { role: "user", content: " is the first method in this provided java class worth seperation? \n only provide a yes or no answer." },
-                    // seperate, but we will only access if first response is yes
-                    { role: "user", content: " separate the first method in the java class code provided earlier and only return the code, no explanation." },
-                    // suggest method names, but only access if first response is yes
-                    { role: "user", content: " what would be the recommended method name for that seperated method?" },
-                ],
+            // generate open ai completion
+            const response = await this.openai.createCompletion({
+                model: "text-davinci-003",
+                prompt: `REFACTOR THE METHOD IN THE FOLLOWING CLASS CODE AND ONLY RETURN THE CODE, NO EXPLANATION. BE PRECISE WHEN IDENTIFYING THE JAVA METHOD IN THE JAVA CLASS: ${file}`,
                 temperature: 0, // randomness of response (1 = random, 0 = deterministic)
-                max_tokens: 200, // max length of response
+                max_tokens: 64, // max length of response
                 top_p: 1.0, // probability of token selection - ignore
                 frequency_penalty: 0.0, // likelihood of repeating (0 = reapeat responses, 1 = diverse responses)
                 presence_penalty: 0.0, // adjust new responses/ideas (0 = trained content , 1 = original content)
             });
+            // log response to console
+            console.log(response.data.choices[0].text.trim());
 
-            // --------------------- DEBUGGING --------------------- //
-            response.data.choices.forEach((choice, index) => {
-                const content = choice.message.content;
-                console.log(`Response ${index + 1}: ${content}`);
-                const finishReason = choice.finish_reason;
-                console.log(`Finish Reason: ${finishReason}`);
-            });
-            // --------------------- DEBUGGING --------------------- //
+            // extract refactored code from response
+            // const answer = response.data.choices[0].message.content.trim();  <---- this doesnt work
+            const answer = response.data.choices[0].text.trim();
+            return answer;
 
-
-            // extracting responses from the response.data.choices object
-            const responses = response.data.choices.map(choice => choice.message.content.trim());
-
-
-            // --------------------- DEBUGGING --------------------- //
-            console.dir(response, { depth: 10 });
-            // --------------------- DEBUGGING --------------------- //
-
-            // return the responses
-            return responses;
         } catch (error) {
             console.error("failed to prompt gpt for separation:", error);
             return [];
@@ -134,22 +118,22 @@ class gptTool {
      * @function writeJavaFile
      * @description writes the contents of a java file to the "Refactor_Code" folder in the cwd
      * @param {string} fileContents - the contents of the java file
-     * @param {string} fileName - the original file name in the format "java_code_#.java"
-     * @returns {string} the new file name in the format "java_refact_#.java"
+     * @param {string} fileName - the original file name in the format "java_code_#.mjs"
+     * @returns {string} the new file name in the format "java_refact_#.mjs"
      */
-    writeJavaFile(fileContents, fileName) {
+    async writeNewFile(fileContents, fileName) {
         // extract file number
         const fileNumber = fileName.match(/\d+/)[0];
         // create the new file name
-        const newFileName = `java_refact_${fileNumber}.java`;
+        const newFileName = `java_refact_${fileNumber}.mjs`;
         // write the file
-        writeFile(newFileName, fileContents, (error) => {
-            if (error) {
-                console.error(`error writing file ${newFileName}: ${error}`);
-            } else {
-                console.log(`file ${newFileName} written successfully`);
-            }
-        });
+        const fileNPath = './Refactor_Code/' + newFileName;
+        try {
+            await writeFile(fileNPath, fileContents);
+            console.log(`file ${newFileName} written successfully`);
+        } catch {
+            console.error(`error writing file ${newFileName}: ${error}`);
+        }
         // return the new file name
         return newFileName;
     }
@@ -174,58 +158,17 @@ class gptTool {
                     continue;
                 }
 
-
-                // --------------------- DEBUGGING --------------------- //
-                // console.log("*** FILE ***", file)
-                // try to see rate limits
-                // try {
-                //     const apiKey = "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"; // Replace with your actual API key
-
-                //     const response = await axios.get('https://api.openai.com/v1/usage', {
-                //         headers: {
-                //             'Authorization': `Bearer ${apiKey}`
-                //         }
-                //     });
-
-                //     const rateLimits = response.data.data[0].usage;
-
-                //     console.log('Rate Limits:');
-                //     console.log('  Requests Remaining:', rateLimits.remaining);
-                //     console.log('  Requests Limit:', rateLimits.limit);
-                //     console.log('  Requests Used:', rateLimits.used);
-                //     console.log('  Reset Timestamp:', new Date(rateLimits.reset * 1000));
-                // } catch (error) {
-                //     console.error('Failed to check rate limits:', error.message);
-                // }
-                // --------------------- DEBUGGING --------------------- //
-
-
                 // generate open ai completion
                 const response = await this.callGPT(file);
-                if (response === []) {
+                if (response.length === 0) {
                     console.log(`api call error for ${this.fileNames[i]}, skipping`);
                     continue;
                 }
-                // check if responses exists & if first response is "yes"
-                const isFirstResponseYes = response && response.length >= 2 && response[1].toLowerCase() === "yes";
 
-                // --------------------- DEBUGGING --------------------- //
-                console.log("*** RESPONSE ***", response[1], response[2], response[3])
+                // write the new java file
+                const newFileName = this.writeNewFile(response, this.fileNames[i]);
+                console.log(`code separated and saved to ${newFileName}`);
 
-                //console.log("*** CODE ***", response[2])
-                // --------------------- DEBUGGING --------------------- //
-
-                // if yes, assign responses of last two prompts to variables
-                if (isFirstResponseYes) {
-                    // extract the code and method name from the response
-                    const separatedCode = response[2];
-                    const methodName = response[3]; // <--- methodName is currently not in use - not sure how we plan to use
-                    // write the new java file
-                    const newFileName = this.writeJavaFile(separatedCode, this.fileNames[i]);
-                    console.log(`code separated and saved to ${newFileName}`);
-                } else {
-                    console.log("seperation not suggested")
-                }
             } catch (error) {
                 console.error(`the following error occurred for file ${this.fileNames[i]} :`, error);
             }
@@ -236,9 +179,6 @@ class gptTool {
 }
 
 // create a new instance of the GptTool class
-// const tool = new gptTool(process.env.OPENAI_API_KEY, fileNames);
-// const tool = new gptTool(process.env.API_KEY, fileNames);
 const tool = new gptTool(process.env.API_KEY, fileNames);
 // refactor the files
 tool.refactorFiles();
-
