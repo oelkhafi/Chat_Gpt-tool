@@ -95,7 +95,7 @@ class gptTool {
                 model: "text-davinci-003",
                 prompt: `Evaluate the methods in the given Java class to determine if they require refactoring for separation. If separation is advised, provide the suggested code changes and recommended method names for the identified methods. Here is the class: ${file}`,
                 temperature: 0, // randomness of response (1 = random, 0 = deterministic)
-                max_tokens: 64, // max length of response
+                max_tokens: 300, // max length of response
                 top_p: 1.0, // probability of token selection - ignore
                 frequency_penalty: 0.0, // likelihood of repeating (0 = reapeat responses, 1 = diverse responses)
                 presence_penalty: 0.0, // adjust new responses/ideas (0 = trained content , 1 = original content)
