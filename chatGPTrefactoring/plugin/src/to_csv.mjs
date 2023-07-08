@@ -1,4 +1,4 @@
-import fileNames from "./java_file_setup.mjs";
+import fileNames from "../../../nodejs_project/java_file_setup.mjs";
 import fs from 'fs';
 
 // Convert array to CSV string
