@@ -4,7 +4,7 @@
   "description": "A tool for refactoring Java code using the GPT-3 API",
   "type": "module",
   "scripts": {
-    "start": "babel-node --extensions .mjs ../../../nodejs_project/config_script.mjs",
+    "start": "babel-node --extensions .mjs ../scripts/config_script.mjs",
     "refactor": "babel-node --extensions .mjs gpt_tool.mjs"
   },
   "repository": {

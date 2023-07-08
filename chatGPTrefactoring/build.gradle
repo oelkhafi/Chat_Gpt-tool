@@ -1,28 +1,56 @@
+// load in necessary plugin for java library - needed for dependencies
 plugins {
     id 'java'
 }
 
-group = 'org.example'
-version = '1.0-SNAPSHOT'
+// set artifacts for project
+ group = 'plugin.gptRefactoringTool'
+ version = '1.0'
 
+// repository gradle is pulling from (not github repo)
 repositories {
     mavenCentral()
 }
 
+// dependencies for java class & tests
 dependencies {
+    // java dependencies
+    implementation 'org.webjars.npm:@babel/cli:7.22.5'
+    implementation 'org.webjars.npm:@babel/core:7.22.5'
+    implementation 'org.webjars.npm:@babel/node:7.22.5'
+    implementation 'org.webjars.npm:@babel/preset-env:7.22.5'
+    implementation 'org.webjars.npm:axios:1.4.0'
+    implementation 'org.webjars.npm:babelrc:0.0.7'
+    implementation 'org.webjars.npm:dotenv:16.3.1'
+    implementation 'org.webjars.npm:fs:0.0.1-security'
+    implementation 'org.webjars.npm:node.js:0.0.1-security'
+    implementation 'org.webjars.npm:openai:3.3.0'
+    // test dependencies
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
+// run config script at beginning of build to load .env vars
+task executeConfigScript(type: Exec) {
+    doFirst {
+        commandLine 'node', 'scripts/config_script.mjs'
+    }
+}
+
+// configures test task to use junit for testing
 test {
     useJUnitPlatform()
 }
 
+// file for saving metadata & dependency
 jar {
+    // metadata file pointing towards main class to be executed
     manifest {
-        attributes "Main-Class": "videoTutorial"
+        attributes "Main-Class": "gpt_tool"
     }
+    // includes project dependencies in the jar file
     from {
+        // collect all dependencies and include
         configurations.runtimeClasspath.collect(it.inDirectory() ? it : zipTree(it))
     }
 }
