@@ -3,40 +3,26 @@ plugins {
     id 'java'
 }
 
-// set artifacts for project
- group = 'plugin.gptRefactoringTool'
- version = '1.0'
-
 // repository gradle is pulling from (not github repo)
 repositories {
     mavenCentral()
+
 }
 
 // dependencies for java class & tests
 dependencies {
-    // java dependencies
-    implementation 'org.webjars.npm:@babel/cli:7.22.5'
-    implementation 'org.webjars.npm:@babel/core:7.22.5'
-    implementation 'org.webjars.npm:@babel/node:7.22.5'
-    implementation 'org.webjars.npm:@babel/preset-env:7.22.5'
-    implementation 'org.webjars.npm:axios:1.4.0'
-    implementation 'org.webjars.npm:babelrc:0.0.7'
-    implementation 'org.webjars.npm:dotenv:16.3.1'
-    implementation 'org.webjars.npm:fs:0.0.1-security'
-    implementation 'org.webjars.npm:node.js:0.0.1-security'
-    implementation 'org.webjars.npm:openai:3.3.0'
-    // test dependencies
+    // calling in dependencies from nodejs project
+    implementation fileTree(dir: '../nodejs_dependencies/node_modules', include: ['**/*.jar'])
+
+    // calling in test dependencies
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
-    // plugin dependencies
-    implementation 'com.intellij:platform-impl:203.7717.56'
-    implementation 'com.intellij:idea-rt:203.7717.56'
 }
 
 // run config script at beginning of build to load .env vars
 task executeConfigScript(type: Exec) {
     doFirst {
-        commandLine 'node', 'scripts/config_script.mjs'
+        commandLine 'node', '../src/nodejs_dependencies/config_script.mjs'
     }
 }
 
@@ -53,8 +39,8 @@ jar {
     }
     // includes project dependencies in the jar file
     from {
-        // collect all dependencies and include
-        configurations.runtimeClasspath.collect(it.inDirectory() ? it : zipTree(it))
+        configurations.runtimeClasspath.getFiles().collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
     }
 }
-
