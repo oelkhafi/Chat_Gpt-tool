@@ -28,6 +28,9 @@ dependencies {
     // test dependencies
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    // plugin dependencies
+    implementation 'com.intellij:platform-impl:203.7717.56'
+    implementation 'com.intellij:idea-rt:203.7717.56'
 }
 
 // run config script at beginning of build to load .env vars
