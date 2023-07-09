@@ -6,5 +6,10 @@
     <description>Refactoring plugin tool powered by ChatGPT.</description>
 
     <extensions defaultExtensionNs="com.intellij">
+        <action id="call.tool.refactor"
+                class="plugin.plugin_action"
+                text="Refactor Files"
+                description="Refactor files using ChatGPT API.">
+        </action>
     </extensions>
 </idea-plugin>

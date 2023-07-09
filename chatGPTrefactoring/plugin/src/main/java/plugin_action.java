@@ -6,11 +6,12 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import gpt_tool;
 
-
 public class PluginAction extends AnAction {
     @Override
     public void actionPerformed(AnActionEvent e) {
-        gptTool refactoringTool = new gptTool();
-        refactoringTool.refactorFiles();
+        // create a new instance of the GptTool class
+        const tool = new gptTool(process.env.API_KEY, fileNames);
+        // refactor the files
+        tool.refactorFiles();
     }
 }
