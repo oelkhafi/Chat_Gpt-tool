@@ -22,7 +22,7 @@ dependencies {
 // run config script at beginning of build to load .env vars
 task executeConfigScript(type: Exec) {
     doFirst {
-        commandLine 'node', '../src/nodejs_dependencies/config_script.mjs'
+        commandLine 'node', '../nodejs_dependencies/config_script.mjs'
     }
 }
 
