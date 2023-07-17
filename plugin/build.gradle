@@ -17,6 +17,11 @@ dependencies {
     // calling in test dependencies
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    // calling in java dependencies
+//    implementation 'com.intellij:openapi'
+//    implementation group: 'com.theokanning.openai-gpt3-java', name: 'api', version: '0.2.0'
+// NEED TO FIGURE OUT WHERE I CAN SOURCE LIBRARY FROM
 }
 
 // run config script at beginning of build to load .env vars
@@ -35,7 +40,7 @@ test {
 jar {
     // metadata file pointing towards main class to be executed
     manifest {
-        attributes "Main-Class": "gpt_tool"
+        attributes "Main-Class": "gptTool"
     }
     // includes project dependencies in the jar file
     from {
