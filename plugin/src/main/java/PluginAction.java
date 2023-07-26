@@ -1,7 +1,7 @@
+import tool.gpt.GptTool;
+
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-
-import tool.gpt.GptTool;
 
 public class PluginAction extends AnAction {
     @Override

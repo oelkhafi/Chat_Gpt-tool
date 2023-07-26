@@ -7,6 +7,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.theokanning.openai.completion.CompletionRequest;
+import com.theokanning.openai.completion.OpenAICompletionResponse;
+
 public class GptTool {
     private List<String> fileNames;
     private String dir1;
