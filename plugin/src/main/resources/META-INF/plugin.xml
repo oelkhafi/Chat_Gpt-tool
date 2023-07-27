@@ -1,0 +1,15 @@
+<idea-plugin>
+    <id>org.jetbrains.research.refactoring</id>
+    <name>ChatGPT Refactoring Tool</name>
+    <version>1.0</version>
+    <vendor> JetBrains </vendor>
+    <description>Refactoring plugin tool powered by ChatGPT.</description>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <action id="call.tool.refactor"
+                class="plugin.plugin_action"
+                text="Refactor Files"
+                description="Refactor files using ChatGPT API.">
+        </action>
+    </extensions>
+</idea-plugin>

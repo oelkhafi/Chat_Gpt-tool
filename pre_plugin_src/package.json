@@ -1,0 +1,31 @@
+{
+  "name": "chatgptrefactortool",
+  "version": "1.0.0",
+  "description": "By inputting code into ChatGPT and requesting it to refactor, one can evaluate if the resulting code is an improvement over the original.",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node new_script.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SE4AIResearch/ChatGPT_Tool.git"
+  },
+  "keywords": [
+    "Refactoring"
+  ],
+  "author": "Drew Carranti",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SE4AIResearch/ChatGPT_Tool/tree/main"
+  },
+  "homepage": "https://github.com/SE4AIResearch/ChatGPT_Tool/blob/main/README.md",
+  "dependencies": {
+    "@babel/node": "^7.22.1",
+    "@babel/preset-env": "^7.22.4",
+    "axios": "^1.4.0",
+    "dotenv": "^16.1.3",
+    "node.js": "^0.0.1-security",
+    "openai": "^3.2.1"
+  }
+}

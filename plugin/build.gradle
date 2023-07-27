@@ -1,0 +1,51 @@
+// load in necessary plugin for java library - needed for dependencies
+plugins {
+    id 'java'
+}
+
+// repository gradle is pulling from (not github repo)
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://plugins.jetbrains.com/maven' }
+
+}
+
+// dependencies for java class & tests
+dependencies {
+    // calling in dependencies from nodejs project
+
+    // calling in test dependencies
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    // calling in java dependencies
+    implementation 'com.theokanning.openai-gpt3-java:api:0.14.0'
+    implementation "com.intellij:ideaIU:2023.1"
+}
+
+// run config script at beginning of build to load .env vars
+task executeConfigScript(type: Exec) {
+    doFirst {
+        commandLine 'node', '../nodejs_dependencies/config_script.mjs'
+    }
+}
+
+// configures test task to use junit for testing
+test {
+    useJUnitPlatform()
+}
+
+// file for saving metadata & dependency
+jar {
+    // metadata file pointing towards main class to be executed
+    manifest {
+        attributes "Main-Class": "gptTool"
+    }
+    // includes project dependencies in the jar file
+    from {
+        configurations.runtimeClasspath.getFiles().collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}
